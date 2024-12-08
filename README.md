@@ -3,6 +3,8 @@ Starting Graylog in your Lab with cluster mode (docker swarm)
 
 This guide will help you run Graylog in cluster mode on multiple nodes thanks to Docker Swarm !
 
+# STILL IN WRITING PROCESS, NEED TO IMPROVE DOCUMENTATION
+
 # Prerequisites:
 
 - Understanding of Linux / Systems
@@ -10,6 +12,12 @@ This guide will help you run Graylog in cluster mode on multiple nodes thanks to
 - 3 VMs (Alma Linux for this Guide)
 - Standard Linux user (non sudoers)
 - DNS server or use /etc/hosts
+
+# DEFAULTS
+
+- Graylog WEB UI
+user: admin
+pasword: admin
 
 # Details of the Lab
 
@@ -163,6 +171,29 @@ To view if the 3 containers on each node is running, run: `docker ps`
 To view if the service stack is opearationnel and everything has a replicas, run: `docker stack services Graylog-Swarm`
 
 ![image](https://github.com/user-attachments/assets/57082965-3b6b-4b76-a844-c3d0182dadfc)
+
+You can check by accessing the URL of graylog node1:
+![image](https://github.com/user-attachments/assets/534f8441-1caa-4007-aa88-2c92e59ab0ea)
+
+If you see the message error about multiple master, you can ignore, it appears only at first startup, to check run this: `curl -u admin:admin http://127.0.0.1:9000/api/system/cluster/nodes | jq .`
+
+![image](https://github.com/user-attachments/assets/d81a5e72-9865-47c3-8dca-2bc3946e6cbb)
+
+All good ! :)
+
+You are now accessing Graylog directly, it's best to use a reverse proxy to handle HTTPS and certificates and load balancing:
+
+Create a folder for your glusterfs: `mkdir -p /home/admin/mnt-glusterfs/traefik/certs`
+
+
+
+Use the docker-stack-with-Traefik.yml
+
+
+Check again the cluster node via API, but this time use the HTTPS: `curl -u admin:admin -k https://graylog.sopaline.lan:443/api/system/cluster/nodes | jq .`
+
+![image](https://github.com/user-attachments/assets/0ae35461-de52-4e81-83e6-efd3a79631a4)
+
 
 
 # Credits 

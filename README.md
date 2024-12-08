@@ -156,6 +156,14 @@ Run the docker stack, the docker-stack.yml contain Opensearch, mongodb and Grayl
 docker stack deploy -c docker-stack.yml Graylog-Swarm
 ```
 
+To view if the 3 containers on each node is running, run: `docker ps`
+
+![image](https://github.com/user-attachments/assets/7ad426a8-bc23-49e0-82a6-e7d82ca84e6c)
+
+To view if the service stack is opearationnel and everything has a replicas, run: `docker stack services Graylog-Swarm`
+
+![image](https://github.com/user-attachments/assets/57082965-3b6b-4b76-a844-c3d0182dadfc)
+
 
 # Credits 
 

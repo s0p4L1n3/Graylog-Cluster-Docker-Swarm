@@ -195,6 +195,45 @@
         <mxCell id="ZmX3UmChQakE0DPMqWdz-57" value="tcp:27017" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="189" y="690" width="60" height="30" as="geometry" />
         </mxCell>
+        <mxCell id="ZmX3UmChQakE0DPMqWdz-58" value="tcp:9200" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="275" y="690" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ZmX3UmChQakE0DPMqWdz-59" value="" style="image;html=1;image=img/lib/clip_art/general/Full_Folder_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="217.27" y="648.22" width="21.73" height="21.78" as="geometry" />
+        </mxCell>
+        <mxCell id="ZmX3UmChQakE0DPMqWdz-60" value="" style="image;html=1;image=img/lib/clip_art/general/Full_Folder_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="336.27" y="550" width="34" height="30.89" as="geometry" />
+        </mxCell>
+        <mxCell id="ZmX3UmChQakE0DPMqWdz-61" value="mongodb" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="326" y="570.5" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ZmX3UmChQakE0DPMqWdz-62" value="" style="image;html=1;image=img/lib/clip_art/general/Full_Folder_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="416.27" y="550" width="34" height="30.89" as="geometry" />
+        </mxCell>
+        <mxCell id="ZmX3UmChQakE0DPMqWdz-63" value="graylog" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="406" y="570.5" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ZmX3UmChQakE0DPMqWdz-65" value="" style="image;html=1;image=img/lib/clip_art/general/Full_Folder_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="493.27" y="550" width="34" height="30.89" as="geometry" />
+        </mxCell>
+        <mxCell id="ZmX3UmChQakE0DPMqWdz-66" value="opensearch" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="483" y="570.5" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ZmX3UmChQakE0DPMqWdz-67" value="" style="image;html=1;image=img/lib/clip_art/general/Full_Folder_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="261.27" y="550" width="34" height="30.89" as="geometry" />
+        </mxCell>
+        <mxCell id="ZmX3UmChQakE0DPMqWdz-68" value="traefik" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="251" y="570.5" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ZmX3UmChQakE0DPMqWdz-69" value="" style="image;html=1;image=img/lib/clip_art/general/Full_Folder_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="290" y="648.22" width="21.73" height="21.78" as="geometry" />
+        </mxCell>
+        <mxCell id="ZmX3UmChQakE0DPMqWdz-70" value="" style="image;html=1;image=img/lib/clip_art/general/Full_Folder_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="284.77" y="748.22" width="21.73" height="21.78" as="geometry" />
+        </mxCell>
+        <mxCell id="ZmX3UmChQakE0DPMqWdz-71" value="" style="image;html=1;image=img/lib/clip_art/general/Full_Folder_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="294.27" y="850" width="21.73" height="21.78" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>

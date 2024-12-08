@@ -1,0 +1,87 @@
+networks:
+  gl-swarm-net:
+    external: true
+
+volumes:
+  mongo01-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/admin/mnt-glusterfs/mongodb/mongo01-data
+      o: bind
+  mongo02-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/admin/mnt-glusterfs/mongodb/mongo02-data
+      o: bind
+  mongo03-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/admin/mnt-glusterfs/mongodb/mongo03-data
+      o: bind
+
+services:
+  mongodb01:
+    image: mongo:7.0.14
+    hostname: mongodb01
+    volumes:
+      - mongo01-data:/data/db
+    ports:
+      - target: 27017
+        published: 27017
+        protocol: tcp
+        mode: host
+    command: 'mongod --replSet dbrs --bind_ip_all'
+    networks:
+      - gl-swarm-net
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == gl-swarm-01.sopaline.lan
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  mongodb02:
+    image: mongo:7.0.14
+    hostname: mongodb02
+    volumes:
+      - mongo02-data:/data/db
+    ports:
+      - target: 27017
+        published: 27018
+        protocol: tcp
+        mode: host
+    command: 'mongod --replSet dbrs --bind_ip_all'
+    networks:
+      - gl-swarm-net
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == gl-swarm-02.sopaline.lan
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  mongodb03:
+    image: mongo:7.0.14
+    hostname: mongodb03
+    volumes:
+      - mongo03-data:/data/db
+    ports:
+      - target: 27017
+        published: 27019
+        protocol: tcp
+        mode: host
+    command: 'mongod --replSet dbrs --bind_ip_all'
+    networks:
+      - gl-swarm-net
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == gl-swarm-03.sopaline.lan
+      replicas: 1
+      restart_policy:
+        condition: on-failure

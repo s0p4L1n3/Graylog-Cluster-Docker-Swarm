@@ -16,13 +16,13 @@ for service in $(docker service ls --format '{{.Name}}'); do
 done
 
 # Afficher les résultats regroupés par nœud
-echo -e "\n=== Tableau des Nœuds et Services ===\n"
+echo -e "\n=== Nodes and Services Tables ===\n"
 
 # Lire les nœuds uniques
 nodes=$(awk '{print $1}' "$temp_file" | sort | uniq)
 
 for node in $nodes; do
-    echo -e "${BLUE}Nœud : $node${RESET}"
+    echo -e "${BLUE}Node : $node${RESET}"
     echo "-------------------------"
     awk -v node="$node" -v pink="$PINK" -v green="$GREEN" -v reset="$RESET" '
     $1 == node {

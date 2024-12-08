@@ -47,13 +47,13 @@ A manager node can be a worker node.
 docker swarm init --advertise-addr 192.168.30.10
 ```
 
-3. To add other manager, run this command to generate a token registration:
+3. To add other manager, run this command on the initalized one to generate a token registration:
 
 ```
 docker swarm join-token manager 
 ```
 
-4. Adding the other managers
+4. Adding the other managers, run the command on the other node
 ```
 docker swarm join --token SWMTKN-1-3txjoa48gdvvzzsjce09ovbmdc4xrq35j7jalxa53er6i6tnnj-1zdfv147ny5xoohiau7l0mxy2 192.168.30.10:2377
 ```
@@ -133,7 +133,12 @@ sudo systemctl daemon-reload && sudo mount -a
 
 If your user is admin, run: `sudo chown -R admin:admin mnt-glusterfs/`
 
+Add for all the nodes in crontab the mounting of glusterfs:
 
+```
+crontab -e
+@reboot mount -a
+```
 
 # Opensearch
 
@@ -143,6 +148,13 @@ sudo firewall-cmd --zone=public --add-port=9200/tcp --permanent
 sudo firewall-cmd --reload
 ```
 
+### CLUSTER GRAYLOG
+
+Run the docker stack, the docker-stack.yml contain Opensearch, mongodb and Graylog configuration using GlusteFS volumes.
+
+```
+docker stack deploy -c docker-stack.yml Graylog-Swarm
+```
 
 
 # Credits 

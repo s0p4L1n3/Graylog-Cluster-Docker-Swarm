@@ -1,0 +1,406 @@
+networks:
+  gl-swarm-net:
+    external: true
+
+volumes:
+  os01-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/admin/mnt-glusterfs/opensearch/os01-data
+      o: bind
+  os02-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/admin/mnt-glusterfs/opensearch/os02-data
+      o: bind
+  os03-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/admin/mnt-glusterfs/opensearch/os03-data
+      o: bind
+  mongo01-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/admin/mnt-glusterfs/mongodb/mongo01-data
+      o: bind
+  mongo02-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/admin/mnt-glusterfs/mongodb/mongo02-data
+      o: bind
+  mongo03-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/admin/mnt-glusterfs/mongodb/mongo03-data
+      o: bind
+  gl01-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/admin/mnt-glusterfs/graylog/gl01-data
+      o: bind
+  gl02-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/admin/mnt-glusterfs/graylog/gl02-data
+      o: bind
+  gl03-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/admin/mnt-glusterfs/graylog/gl03-data
+      o: bind
+
+services:
+
+########## MONGODB ############
+
+  mongodb01:
+    image: mongo:7.0.14
+    hostname: mongodb01
+    volumes:
+      - mongo01-data:/data/db
+      - /home/admin/mnt-glusterfs/mongodb/initdb.d:/docker-entrypoint-initdb.d
+      - /home/admin/mnt-glusterfs/mongodb/init-replset.js:/init-replset.js
+    ports:
+      - target: 27017
+        published: 27017
+        protocol: tcp
+        mode: host
+    command: 'mongod --replSet dbrs --bind_ip_all'
+    networks:
+      - gl-swarm-net
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == gl-swarm-01.sopaline.lan
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  mongodb02:
+    image: mongo:7.0.14
+    hostname: mongodb02
+    volumes:
+      - mongo02-data:/data/db
+    ports:
+      - target: 27017
+        published: 27018
+        protocol: tcp
+        mode: host
+    command: 'mongod --replSet dbrs --bind_ip_all'
+    networks:
+      - gl-swarm-net
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == gl-swarm-02.sopaline.lan
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  mongodb03:
+    image: mongo:7.0.14
+    hostname: mongodb03
+    volumes:
+      - mongo03-data:/data/db
+    ports:
+      - target: 27017
+        published: 27019
+        protocol: tcp
+        mode: host
+    command: 'mongod --replSet dbrs --bind_ip_all'
+    networks:
+      - gl-swarm-net
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == gl-swarm-03.sopaline.lan
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+############ OPENSEARCH ##############
+
+  opensearch01:
+    image: opensearchproject/opensearch:2.15.0
+    hostname: os01
+    volumes:
+      - os01-data:/usr/share/opensearch/data
+      #- "./certs:/usr/share/opensearch/config/certificates:ro"
+    ports:
+      - target: 9200
+        published: 9201
+        protocol: tcp
+        mode: host
+    environment:
+      - "OPENSEARCH_JAVA_OPTS=-Xms1024m -Xmx1024m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - "cluster.name=opensearch-cluster"
+      - "node.name=os01"
+      - "discovery.seed_hosts=opensearch01,opensearch02,opensearch03"
+      - "cluster.initial_master_nodes=os01,os02,os03"
+      - "bootstrap.memory_lock=true"
+#      - "action.auto_create_index=false"
+      - "plugins.security.ssl.http.enabled=false"
+      - "plugins.security.disabled=true"
+      # Can generate a password for `OPENSEARCH_INITIAL_ADMIN_PASSWORD` using a linux device via
+      # tr -dc A-Z-a-z-0-9_@#%^-_=+  devurandom  head -c${1-32}
+      - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=Chocolate1-Strawberry-Opacity-Lemon"
+      - "network.host=0.0.0.0"
+      #plugins.security.ssl.transport.pemkey_filepath: certificates/os01/os01.key # relative path
+      #plugins.security.ssl.transport.pemcert_filepath: certificates/os01/os01.pem
+      #plugins.security.ssl.http.pemkey_filepath: certificates/os01/os01.key
+      #plugins.security.ssl.http.pemcert_filepath: certificates/os01/os01.pem
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    networks:
+      - gl-swarm-net
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == gl-swarm-01.sopaline.lan
+      restart_policy:
+        condition: on-failure
+
+  opensearch02:
+    image: opensearchproject/opensearch:2.15.0
+    hostname: os02
+    volumes:
+      - os02-data:/usr/share/opensearch/data
+      #- "./certs:/usr/share/opensearch/config/certificates:ro"
+    ports:
+      - target: 9200
+        published: 9202
+        protocol: tcp
+        mode: host
+    environment:
+      - "OPENSEARCH_JAVA_OPTS=-Xms1024m -Xmx1024m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - "cluster.name=opensearch-cluster"
+      - "node.name=os02"
+      - "discovery.seed_hosts=opensearch01,opensearch02,opensearch03"
+      - "cluster.initial_master_nodes=os01,os02,os03"
+      - "bootstrap.memory_lock=true"
+ #     - "action.auto_create_index=false"
+      - "plugins.security.ssl.http.enabled=false"
+      - "plugins.security.disabled=true"
+      # Can generate a password for `OPENSEARCH_INITIAL_ADMIN_PASSWORD` using a linux device via
+      # tr -dc A-Z-a-z-0-9_@#%^-_=+  devurandom  head -c${1-32}
+      - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=Chocolate1-Strawberry-Opacity-Lemon"
+      - "network.host=0.0.0.0"
+      #plugins.security.ssl.transport.pemkey_filepath: certificates/os01/os01.key # relative path
+      #plugins.security.ssl.transport.pemcert_filepath: certificates/os01/os01.pem
+      #plugins.security.ssl.http.pemkey_filepath: certificates/os01/os01.key
+      #plugins.security.ssl.http.pemcert_filepath: certificates/os01/os01.pem
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    networks:
+      - gl-swarm-net
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == gl-swarm-02.sopaline.lan
+      restart_policy:
+        condition: on-failure
+
+  opensearch03:
+    image: opensearchproject/opensearch:2.15.0
+    hostname: os03
+    volumes:
+      - os03-data:/usr/share/opensearch/data
+      #- "./certs:/usr/share/opensearch/config/certificates:ro"
+    ports:
+      - target: 9200
+        published: 9203
+        protocol: tcp
+        mode: host
+    environment:
+      - "OPENSEARCH_JAVA_OPTS=-Xms1024m -Xmx1024m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - "cluster.name=opensearch-cluster"
+      - "node.name=os03"
+      - "discovery.seed_hosts=opensearch01,opensearch02,opensearch03"
+      - "cluster.initial_master_nodes=os01,os02,os03"
+      - "bootstrap.memory_lock=true"
+  #    - "action.auto_create_index=false"
+      - "plugins.security.ssl.http.enabled=false"
+      - "plugins.security.disabled=true"
+      # Can generate a password for `OPENSEARCH_INITIAL_ADMIN_PASSWORD` using a linux device via
+      # tr -dc A-Z-a-z-0-9_@#%^-_=+  devurandom  head -c${1-32}
+      - "OPENSEARCH_INITIAL_ADMIN_PASSWORD=Chocolate1-Strawberry-Opacity-Lemon"
+      - "network.host=0.0.0.0"
+      #plugins.security.ssl.transport.pemkey_filepath: certificates/os01/os01.key # relative path
+      #plugins.security.ssl.transport.pemcert_filepath: certificates/os01/os01.pem
+      #plugins.security.ssl.http.pemkey_filepath: certificates/os01/os01.key
+      #plugins.security.ssl.http.pemcert_filepath: certificates/os01/os01.pem
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    networks:
+      - gl-swarm-net
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == gl-swarm-03.sopaline.lan
+      restart_policy:
+        condition: on-failure
+
+############## GRAYLOG ##########################
+
+  graylog01:
+    image: graylog/graylog:6.1.4
+    hostname: graylog01
+    depends_on:
+      - mongodb01
+      - mongodb02
+      - mongodb03
+      - opensearch01
+      - opensearch02
+      - opensearch03
+    volumes:
+      - gl01-data:/usr/share/graylog/data
+      - /home/admin/mnt-glusterfs/graylog/csv:/srv
+    environment:
+    # CHANGE ME (must be at least 16 characters)!
+      GRAYLOG_PASSWORD_SECRET: somepasswordpepper
+    # To change password: echo -n "Enter Password: " && head -1 < /dev/stdin | tr -d '\n' | sha256sum | cut -d " " -f1
+      GRAYLOG_ROOT_PASSWORD_SHA2: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+      GRAYLOG_ELASTICSEARCH_HOSTS: "http://opensearch01:9200,http://opensearch02:9200,http://opensearch03:9200"
+      #GRAYLOG_HTTP_EXTERNAL_URI: "https://graylog.sopaline.lan/"
+      GRAYLOG_HTTP_EXTERNAL_URI: "http://127.0.0.1:9000/"
+      GRAYLOG_MONGODB_URI: "mongodb://mongodb01:27017,mongodb02:27017,mongodb03:27017/graylog"
+    entrypoint: "/docker-entrypoint.sh"
+    networks:
+      - gl-swarm-net
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == gl-swarm-01.sopaline.lan
+      restart_policy:
+        condition: on-failure
+    ports:
+      # Syslog TCP
+      - target: 1514
+        published: 1514
+        protocol: tcp
+        mode: host
+      # Beats
+      - target: 5044
+        published: 5044
+        protocol: tcp
+        mode: host
+       # Graylog API
+      - target: 9000
+        published: 9000
+        protocol: tcp
+        mode: host
+
+  graylog02:
+    image: graylog/graylog:6.1.4
+    hostname: graylog02
+    depends_on:
+      - mongodb01
+      - mongodb02
+      - mongodb03
+      - opensearch01
+      - opensearch02
+      - opensearch03
+    volumes:
+      - gl02-data:/usr/share/graylog/data
+      - /home/admin/mnt-glusterfs/graylog/csv:/srv
+    environment:
+      GRAYLOG_IS_MASTER: "false"
+    # CHANGE ME (must be at least 16 characters)!
+      GRAYLOG_PASSWORD_SECRET: somepasswordpepper
+    # To change password: echo -n "Enter Password: " && head -1 < /dev/stdin | tr -d '\n' | sha256sum | cut -d " " -f1
+      GRAYLOG_ROOT_PASSWORD_SHA2: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+      GRAYLOG_ELASTICSEARCH_HOSTS: "http://opensearch01:9200,http://opensearch02:9200,http://opensearch03:9200"
+      #GRAYLOG_HTTP_EXTERNAL_URI: "https://graylog.sopaline.lan/"
+      GRAYLOG_HTTP_EXTERNAL_URI: "http://127.0.0.1:9000/"
+      GRAYLOG_HTTP_BIND_ADDRESS: "0.0.0.0:9001"
+      GRAYLOG_MONGODB_URI: "mongodb://mongodb01:27017,mongodb02:27017,mongodb03:27017/graylog"
+    entrypoint: "/docker-entrypoint.sh"
+    networks:
+      - gl-swarm-net
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == gl-swarm-02.sopaline.lan
+      restart_policy:
+        condition: on-failure
+    ports:
+      # Syslog TCP
+      - target: 1514
+        published: 1515
+        protocol: tcp
+        mode: host
+      # Beats
+      - target: 5044
+        published: 5045
+        protocol: tcp
+        mode: host
+       # Graylog API
+      - target: 9000
+        published: 9001
+        protocol: tcp
+        mode: host
+
+  graylog03:
+    image: graylog/graylog:6.1.4
+    hostname: graylog03
+    depends_on:
+      - mongodb01
+      - mongodb02
+      - mongodb03
+      - opensearch01
+      - opensearch02
+      - opensearch03
+    volumes:
+      - gl03-data:/usr/share/graylog/data
+      - /home/admin/mnt-glusterfs/graylog/csv:/srv
+    environment:
+      GRAYLOG_IS_MASTER: "false"
+    # CHANGE ME (must be at least 16 characters)!
+      GRAYLOG_PASSWORD_SECRET: somepasswordpepper
+    # To change password: echo -n "Enter Password: " && head -1 < /dev/stdin | tr -d '\n' | sha256sum | cut -d " " -f1
+      GRAYLOG_ROOT_PASSWORD_SHA2: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+      GRAYLOG_ELASTICSEARCH_HOSTS: "http://opensearch01:9200,http://opensearch02:9200,http://opensearch03:9200"
+      #GRAYLOG_HTTP_EXTERNAL_URI: "https://graylog.sopaline.lan/"
+      GRAYLOG_HTTP_EXTERNAL_URI: "http://127.0.0.1:9000/"
+      GRAYLOG_HTTP_BIND_ADDRESS: "0.0.0.0:9002"
+      GRAYLOG_MONGODB_URI: "mongodb://mongodb01:27017,mongodb02:27017,mongodb03:27017/graylog"
+    entrypoint: "/docker-entrypoint.sh"
+    networks:
+      - gl-swarm-net
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == gl-swarm-03.sopaline.lan
+      restart_policy:
+        condition: on-failure
+    ports:
+      # Syslog TCP
+      - target: 1514
+        published: 1516
+        protocol: tcp
+        mode: host
+      # Beats
+      - target: 5044
+        published: 5046
+        protocol: tcp
+        mode: host
+       # Graylog API
+      - target: 9000
+        published: 9002
+        protocol: tcp
+        mode: host

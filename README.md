@@ -36,6 +36,7 @@ If not, you will have a message error for MongoDB: `WARNING: MongoDB 5.0+ requir
 
 1. Install docker
 2.  Configure non sudoers users to use docker: `sudo usermod -aG docker $USER`
+3.  Create a swarm network: `docker network create -d overlay --attachable gl-swarm-net`, it will be used in the docker compose files as an external network, (created manually)
 
 ## Swarm
 
@@ -131,6 +132,16 @@ sudo systemctl daemon-reload && sudo mount -a
 ```
 
 If your user is admin, run: `sudo chown -R admin:admin mnt-glusterfs/`
+
+
+
+# Opensearch
+
+```
+sudo firewall-cmd --zone=public --add-port=9300/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=9200/tcp --permanent
+sudo firewall-cmd --reload
+```
 
 
 

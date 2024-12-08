@@ -194,7 +194,88 @@ Check again the cluster node via API, but this time use the HTTPS: `curl -u admi
 
 ![image](https://github.com/user-attachments/assets/0ae35461-de52-4e81-83e6-efd3a79631a4)
 
+## HIGH AVAILABILITY 
 
+One problem remains, even if traefik is in swarm mode, as the DNS entry point to the IP Addresse of the first VM, if this VM is down, access to graylog will not be working.
+We need to create a VIP with Keepalive.
+
+On all VM nodes (not docker), install Keepalive:
+```
+sudo dnf install -y keepalived
+```
+
+Edit the conf Keepalive: /etc/keepalived/keepalived.conf
+
+- Keepalive node 1: 
+```
+! Configuration File for keepalived
+
+vrrp_instance VI_1 {
+    state MASTER
+    interface ens18   # Network card (vérifiez with "ip a")
+    virtual_router_id 51
+    priority 100      # Master node higher priority
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass somepassword
+    }
+    virtual_ipaddress {
+        192.168.30.100/24  # VIP
+    }
+}
+```
+
+- Keepalive node 2:
+
+```
+vrrp_instance VI_1 {
+    state BACKUP
+    interface ens18
+    virtual_router_id 51
+    priority 90       # Lower priority
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass somepassword
+    }
+    virtual_ipaddress {
+        192.168.30.100/24
+    }
+}
+```
+
+- Keepalive node 3: 
+
+```
+vrrp_instance VI_1 {
+    state BACKUP
+    interface ens18
+    virtual_router_id 51
+    priority 80       # Lower priority
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass somepassword
+    }
+    virtual_ipaddress {
+        192.168.30.100/24
+    }
+}
+```
+Enable and restart the services:
+```
+sudo systemctl enable keepalived
+sudo systemctl restart keepalived
+```
+
+Check the IP VIP
+```
+ip a | grep 192.168.30.100
+    inet 192.168.30.100/24 scope global secondary ens18
+```
+
+And change the DNS to point to the VIP, done ! 
 
 # Credits 
 

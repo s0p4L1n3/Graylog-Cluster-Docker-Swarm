@@ -2,6 +2,8 @@ networks:
   gl-swarm-net:
     external: true
 
+#### Volumes bind to GlusterFS path for each containers
+
 volumes:
   os01-data:
     driver: local
@@ -452,6 +454,7 @@ services:
      - /home/admin/mnt-glusterfs/traefik/traefik.yaml:/etc/traefik/traefik.yaml
      - /home/admin/mnt-glusterfs/traefik/certs/:/certs/
      - /var/run/docker.sock:/var/run/docker.sock
+     #- ./config/traefik:/config:ro
    networks:
       - gl-swarm-net
    deploy:

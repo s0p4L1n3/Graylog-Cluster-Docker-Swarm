@@ -5,6 +5,7 @@ Starting Graylog in your Lab with cluster mode (docker swarm)
 This guide will help you run Graylog in cluster mode on multiple nodes thanks to Docker Swarm !
 You need to pay attention to all the steps to take before running the docker stack YML file, because they will help you to achieve a real cluster environment with high availability.
 
+![image](https://github.com/user-attachments/assets/9daa469a-81bb-4dd4-9616-444b21b1c64a)
 
 ## **1. Hardware and Software Requirements**
 
@@ -339,7 +340,11 @@ Check cluster node via API, use the HTTPS: `curl -u admin:admin -k https://grayl
    - user: admin
    - pasword: admin
 
-# Credits 
+# 8 Docker-stack.YML construction
+
+
+
+# 8 Credits 
 
 Thanks to for the understanding of the basics:
 

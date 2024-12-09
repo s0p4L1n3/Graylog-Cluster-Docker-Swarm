@@ -212,7 +212,7 @@ Edit the conf Keepalive: /etc/keepalived/keepalived.conf
 
 vrrp_instance VI_1 {
     state MASTER
-    interface ens18   # Network card (vérifiez with "ip a")
+    interface ens18   # Network card (check with "ip a")
     virtual_router_id 51
     priority 100      # Master node higher priority
     advert_int 1

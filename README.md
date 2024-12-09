@@ -1,27 +1,280 @@
-# Graylog-Cluster-Docker-Swarm
+# **Deployment Guide - High-Availability Docker Swarm Cluster with Graylog and Traefik**
+
 Starting Graylog in your Lab with cluster mode (docker swarm)
 
 This guide will help you run Graylog in cluster mode on multiple nodes thanks to Docker Swarm !
+You need to pay attention to all the steps to take before running the docker stack YML file, because they will help you to achieve a real cluster environment with high availability.
 
-# STILL IN WRITING PROCESS, NEED TO IMPROVE DOCUMENTATION
 
-# Prerequisites:
+## **1. Hardware and Software Requirements**
 
-- Understanding of Linux / Systems
-- Understanding of Docker
-- 3 VMs (Alma Linux for this Guide)
-- Standard Linux user (non sudoers)
-- DNS server or use /etc/hosts
+### Hardware
+- **3 Swarm Manager VMs**: `gl-swarm-01`, `gl-swarm-02`, `gl-swarm-03`
 
-# DEFAULTS
+### Software
+- **OS**: Alma Linux 9.5
+- **Docker**: Version 27.3.1
+- **Traefik**: Reverse Proxy v3.2.1
+- **Graylog**: Version 6.1.4
+- **MongoDB**: Version 7.0.14
+- **OpenSearch**: Version 2.15.0
+
+---
+
+## **2. VM and Network Configuration**
+
+### 2.1 Configure Hosts
+
+Edit and append DNS entries to the `/etc/hosts` file on **all VMs**:
+
+```bash
+cat <<EOF >> /etc/hosts
+192.168.1.11   gl-swarm-01.sopaline.lan
+192.168.1.12   gl-swarm-02.sopaline.lan
+192.168.1.13   gl-swarm-03.sopaline.lan
+192.168.1.100  graylog.sopaline.lan
+EOF
+```
+
+### 2.2 Install Required Packages
+
+Install the necessary tools on each **VM**:
+
+```bash
+# Update packages
+sudo apt update && sudo apt upgrade -y
+
+# Install Docker and Docker Compose
+sudo dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+sudo dnf install docker-ce docker-ce-cli containerd.io
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo usermod -aG docker $USER
+```
+
+- **GlusterFS**: High-availability storage servers.
+- **Keepalived**: For managing the **Virtual IP (VIP)**.
+```
+# Install GlusterFS and Keepalived
+sudo dnf install epel-release centos-release-gluster10
+sudo apt install glusterfs-server keepalived -y
+sudo systemctl enable glusterd
+sudo systemctl start glusterd
+sudo systemctl enable keepalived
+sudo systemctl start keepalived
+```
+
+### 2.3 Set firewalld on all VMs
+
+```
+systemctl enable firewalld && systemctl start firewalld
+sudo firewall-cmd --permanent --add-port=2377/tcp --zone=public
+sudo firewall-cmd --zone=public --add-port=7946/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=7946/udp --permanent
+sudo firewall-cmd --zone=public --add-port=4789/udp --permanent
+sudo firewall-cmd --zone=public --add-service=glusterfs --permanent
+sudo firewall-cmd --zone=public --add-port=9300/tcp --permanent
+sudo firewall-cmd --zone=public --add-port=9200/tcp --permanent
+firewall-cmd --reload
+```
+Or simply disable it: `systemctl disable firewalld && systemctl stop firewalld`
+
+### 2.4 Set Up Docker Swarm Cluster
+
+Initialize Docker Swarm on **gl-swarm-01**:
+```bash
+sudo docker swarm init --advertise-addr 192.168.1.10
+docker swarm join-token manager
+```
+Copy the command described and paste it to **gl-swarm-02** and **gl-swarm-03**
+
+Join **gl-swarm-02** and **gl-swarm-03** to the cluster:
+```bash
+sudo docker swarm join --token <SWARM_TOKEN> 192.168.1.10:2377
+```
+Verify the cluster:
+```bash
+sudo docker node ls
+```
+
+All nodes are part of Docker swarm cluster ! Then let's set GlusterFS for cluster storage that will be used by all of our containers across the swarm cluster.
+
+## **3. GlusterFS Configuration**
+
+### 3.1 Create Shared Volumes
+
+On **gl-swarm-01**, **gl-swarm-02**, **gl-swarm-03**:
+
+1. Create the storage:
+   ```bash
+   sudo mkdir /srv/glusterfs
+   ```
+
+2. Configure GlusterFS on **gl-swarm-01**:
+   ```bash
+   sudo gluster peer probe gl-swarm-02
+   sudo gluster peer probe gl-swarm-03
+   sudo gluster volume create gv0 replica 4 transport tcp gl-swarm-01:/srv/glusterfs gl-swarm-02:/srv/glusterfs gl-swarm-03:/srv/glusterfs
+   sudo gluster volume start gv0
+   ```
+   Verify gluster cluster with: `sudo gluster peer status`
+
+We will then use`/home/admin/mnt-glusterfs` as a mountpoint.
+
+```
+mkdir /home/admin/mnt-glusterfs
+```
+
+3. Mount the GlusterFS volume on **gl-swarm-01**:
+   ```bash
+   echo 'gl-swarm-01:/gv0    /home/admin/mnt-glusterfs    glusterfs    defaults,_netdev  0 0' | sudo tee -a /etc/fstab
+   sudo systemctl daemon-reload && mount -a
+   { crontab -l; echo "@reboot mount -a"; } | sudo crontab -
+   ```
+4. Mount the GlusterFS volume on **gl-swarm-02**:
+   ```bash
+   echo 'gl-swarm-02:/gv0    /home/admin/mnt-glusterfs    glusterfs    defaults,_netdev  0 0' | sudo tee -a /etc/fstab
+   sudo systemctl daemon-reload && mount -a
+   { crontab -l; echo "@reboot mount -a"; } | sudo crontab -
+   ```
+5. Mount the GlusterFS volume on **gl-swarm-03**:
+   ```bash
+   echo 'gl-swarm-03:/gv0    /home/admin/mnt-glusterfs    glusterfs    defaults,_netdev  0 0' | sudo tee -a /etc/fstab
+   sudo systemctl daemon-reload && mount -a
+   { crontab -l; echo "@reboot mount -a"; } | sudo crontab -
+   ```
+
+ 6.  Change the permissions according to your user, (mine is admin):
+ ```
+ sudo chown -R admin:admin /home/admin/mnt-glusterfs/
+ ```
+
+## **4. Keepalived Configuration (VIP)**
+
+Create a `/etc/keepalived/keepalived.conf` file on each manager VM. 
+Check your active network card before pasting the cat EOF command: `ip a`
+
+For **gl-swarm-01**:
+```bash
+cat <<EOF > /etc/keepalived/keepalived.conf
+vrrp_instance VI_1 {
+    state MASTER
+    interface ens18  
+    virtual_router_id 51
+    priority 100      # Master node higher priority
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass somepassword
+    }
+    virtual_ipaddress {
+        192.168.30.100/24  # VIP
+    }
+}
+EOF
+```
+
+Restart Keepalived:
+```bash
+sudo systemctl restart keepalived
+```
+
+For **gl-swarm-02**:
+```bash
+cat <<EOF > /etc/keepalived/keepalived.conf
+vrrp_instance VI_1 {
+    state BACKUP
+    interface ens18   # Network card (vérifiez with "ip a")
+    virtual_router_id 51
+    priority 90      # Master node higher priority
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass somepassword
+    }
+    virtual_ipaddress {
+        192.168.30.100/24  # VIP
+    }
+}
+EOF
+```
+
+Restart Keepalived:
+```bash
+sudo systemctl restart keepalived
+```
+
+For **gl-swarm-01**:
+```bash
+cat <<EOF > /etc/keepalived/keepalived.conf
+vrrp_instance VI_1 {
+    state BACKUP
+    interface ens18   # Network card (vérifiez with "ip a")
+    virtual_router_id 51
+    priority 80      # Master node higher priority
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass somepassword
+    }
+    virtual_ipaddress {
+        192.168.30.100/24  # VIP
+    }
+}
+EOF
+```
+
+Restart Keepalived:
+```bash
+sudo systemctl restart keepalived
+```
+
+## **5. Deploy the Stack**
+
+### 5.1 Prepare network
+
+Create an overlay network: `docker network create -d overlay --attachable gl-swarm-net`, it will be used in the docker compose files as an external network. 
+This network will allow to all containers across the nodes to communicate between them.
+
+### 5.2 Prepare the containers folders
+
+```
+mkdir -p /home/admin/mnt-glusterfs/{graylog/{csv,gl01-data,gl02-data,gl03-data},opensearch/{os01-data,os02-data,os03-data},mongodb{mongo01-data,mongo02-data,mongo03-data,initdb.d},traefik/certs}
+```
+
+The folder tree will look like this
+```
+/home/admin/mnt-glusterfs/
+├── graylog
+│   ├── csv
+│   ├── gl01-data
+│   ├── gl02-data
+│   └── gl03-data
+├── opensearch
+│   ├── os01-data
+│   ├── os02-data
+│   └── os03-data
+├── mongodb
+│   ├── mongo01-data
+│   ├── mongo02-data
+│   ├── mongo03-data
+│   └── initdb.d
+└── traefik
+    └── certs
+```
+
+### 5.2 Prepare the containers files
+
+
+
+
+# DEFAULTS CREDS
 
 - Graylog WEB UI
-user: admin
-pasword: admin
+   - user: admin
+   - pasword: admin
 
-# Details of the Lab
 
-192.168.30.0/24
 
 # PROXMOX
 
@@ -44,34 +297,10 @@ If not, you will have a message error for MongoDB: `WARNING: MongoDB 5.0+ requir
 
 1. Install docker
 2.  Configure non sudoers users to use docker: `sudo usermod -aG docker $USER`
-3.  Create a swarm network: `docker network create -d overlay --attachable gl-swarm-net`, it will be used in the docker compose files as an external network, (created manually)
 
-## Swarm
 
-A manager node can be a worker node.
 
-1. Initialize the first node
-```
-docker swarm init --advertise-addr 192.168.30.10
-```
 
-3. To add other manager, run this command on the initalized one to generate a token registration:
-
-```
-docker swarm join-token manager 
-```
-
-4. Adding the other managers, run the command on the other node
-```
-docker swarm join --token SWMTKN-1-3txjoa48gdvvzzsjce09ovbmdc4xrq35j7jalxa53er6i6tnnj-1zdfv147ny5xoohiau7l0mxy2 192.168.30.10:2377
-```
-
-5. View the swarm cluster
-```
-docker node ls
-```
-
-![image](https://github.com/user-attachments/assets/77f736a2-b830-4eda-97e7-61572b741a94)
 
 
 Now that our Docker Swarm cluster is initialized and all nodes are active, we can move on to the next step: managing storage, particularly before deploying Graylog in containers.

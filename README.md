@@ -340,7 +340,7 @@ Check cluster node via API, use the HTTPS: `curl -u admin:admin -k https://grayl
    - user: admin
    - pasword: admin
 
-# :blue_book: 8 Docker-stack.YML config
+# 7 :blue_book: Docker-stack.YML config
 
 [Docker Stack File Config](https://github.com/s0p4L1n3/Graylog-Cluster-Docker-Swarm/blob/main/DockerStack-configfile.md)
 

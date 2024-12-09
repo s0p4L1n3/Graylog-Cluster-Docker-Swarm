@@ -42,10 +42,10 @@ Edit and append DNS entries to the `/etc/hosts` file on **all VMs**:
 
 ```bash
 cat <<EOF >> /etc/hosts
-192.168.1.11   gl-swarm-01.sopaline.lan
-192.168.1.12   gl-swarm-02.sopaline.lan
-192.168.1.13   gl-swarm-03.sopaline.lan
-192.168.1.100  graylog.sopaline.lan
+192.168.30.11   gl-swarm-01.sopaline.lan
+192.168.30.12   gl-swarm-02.sopaline.lan
+192.168.30.13   gl-swarm-03.sopaline.lan
+192.168.30.100  graylog.sopaline.lan
 EOF
 ```
 
@@ -96,14 +96,14 @@ Or simply disable it: `systemctl disable firewalld && systemctl stop firewalld`
 
 Initialize Docker Swarm on **gl-swarm-01**:
 ```bash
-sudo docker swarm init --advertise-addr 192.168.1.10
+sudo docker swarm init --advertise-addr 192.168.30.10
 docker swarm join-token manager
 ```
 Copy the command described and paste it to **gl-swarm-02** and **gl-swarm-03**
 
 Join **gl-swarm-02** and **gl-swarm-03** to the cluster:
 ```bash
-sudo docker swarm join --token <SWARM_TOKEN> 192.168.1.10:2377
+sudo docker swarm join --token <SWARM_TOKEN> 192.168.30.10:2377
 ```
 Verify the cluster:
 ```bash

@@ -81,7 +81,7 @@ Do not start now the Keepalive service.
 ### 2.3 Set firewalld on all VMs
 
 ```
-sudo systemctl enable firewalld && systemctl start firewalld
+sudo systemctl enable firewalld && sudo systemctl start firewalld
 sudo firewall-cmd --permanent --add-port=2377/tcp --zone=public
 sudo firewall-cmd --zone=public --add-port=7946/tcp --permanent
 sudo firewall-cmd --zone=public --add-port=7946/udp --permanent

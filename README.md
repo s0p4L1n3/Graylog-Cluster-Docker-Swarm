@@ -128,7 +128,7 @@ On **gl-swarm-01**, **gl-swarm-02**, **gl-swarm-03**:
    ```bash
    sudo gluster peer probe gl-swarm-02
    sudo gluster peer probe gl-swarm-03
-   sudo gluster volume create gv0 replica 4 transport tcp gl-swarm-01:/srv/glusterfs gl-swarm-02:/srv/glusterfs gl-swarm-03:/srv/glusterfs
+   sudo gluster volume create gv0 replica 3 transport tcp gl-swarm-01:/srv/glusterfs gl-swarm-02:/srv/glusterfs gl-swarm-03:/srv/glusterfs
    sudo gluster volume start gv0
    ```
    Verify gluster cluster with: `sudo gluster peer status`

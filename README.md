@@ -261,7 +261,7 @@ This network will allow to all containers across the nodes to communicate betwee
 ### 5.2 Prepare the containers folders
 
 ```
-mkdir -p /home/admin/mnt-glusterfs/{graylog/{csv,gl01-data,gl02-data,gl03-data},opensearch/{os01-data,os02-data,os03-data},mongodb{mongo01-data,mongo02-data,mongo03-data,initdb.d},traefik/certs}
+mkdir -p /home/admin/mnt-glusterfs/{graylog/{csv,gl01-data,gl02-data,gl03-data},opensearch/{os01-data,os02-data,os03-data},mongodb/{mongo01-data,mongo02-data,mongo03-data,initdb.d},traefik/certs}
 ```
 
 The folder tree will look like this

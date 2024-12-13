@@ -83,6 +83,8 @@ services:
       placement:
         constraints:
           - node.hostname == gl-swarm-01.sopaline.lan
+          # it can be the constraint below, check the hostname with docker node ls command
+          #- node.hostname == gl-swarm-01
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -104,6 +106,8 @@ services:
       placement:
         constraints:
           - node.hostname == gl-swarm-02.sopaline.lan
+          # it can be the constraint below, check the hostname with docker node ls command
+          #- node.hostname == gl-swarm-02
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -125,6 +129,8 @@ services:
       placement:
         constraints:
           - node.hostname == gl-swarm-03.sopaline.lan
+          # it can be the constraint below, check the hostname with docker node ls command
+          #- node.hostname == gl-swarm-03
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -170,6 +176,8 @@ services:
       placement:
         constraints:
           - node.hostname == gl-swarm-01.sopaline.lan
+          # it can be the constraint below, check the hostname with docker node ls command
+          #- node.hostname == gl-swarm-01
       restart_policy:
         condition: on-failure
 
@@ -212,6 +220,8 @@ services:
       placement:
         constraints:
           - node.hostname == gl-swarm-02.sopaline.lan
+          # it can be the constraint below, check the hostname with docker node ls command
+          #- node.hostname == gl-swarm-02
       restart_policy:
         condition: on-failure
 
@@ -254,6 +264,8 @@ services:
       placement:
         constraints:
           - node.hostname == gl-swarm-03.sopaline.lan
+          # it can be the constraint below, check the hostname with docker node ls command
+          #- node.hostname == gl-swarm-03
       restart_policy:
         condition: on-failure
 
@@ -300,6 +312,8 @@ services:
       placement:
         constraints:
           - node.hostname == gl-swarm-01.sopaline.lan
+          # it can be the constraint below, check the hostname with docker node ls command
+          #- node.hostname == gl-swarm-01
       restart_policy:
         condition: on-failure
     ports:
@@ -356,6 +370,8 @@ services:
       placement:
         constraints:
           - node.hostname == gl-swarm-02.sopaline.lan
+          # it can be the constraint below, check the hostname with docker node ls command
+          #- node.hostname == gl-swarm-02
       restart_policy:
         condition: on-failure
     ports:
@@ -412,6 +428,8 @@ services:
       placement:
         constraints:
           - node.hostname == gl-swarm-03.sopaline.lan
+          # it can be the constraint below, check the hostname with docker node ls command
+          #- node.hostname == gl-swarm-02
       restart_policy:
         condition: on-failure
     ports:

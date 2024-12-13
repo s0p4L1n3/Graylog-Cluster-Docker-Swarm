@@ -29,8 +29,9 @@ If not, you will have a message error for MongoDB: `WARNING: MongoDB 5.0+ requir
 To avoid errors on opensearch, set the max virtual memory areas to 262144
 ```
 echo 'vm.max_map_count = 262144' | sudo tee -a /etc/sysctl.conf
-
 ```
+
+After reboot, you can verify that the setting is still correct by running `sysctl vm.max_map_count`
 
 ### Software
 - **OS**: Alma Linux 9.5

@@ -70,7 +70,7 @@ sudo usermod -aG docker $USER
 ```
 # Install GlusterFS and Keepalived
 sudo dnf install epel-release centos-release-gluster10
-sudo apt install glusterfs-server keepalived -y
+sudo dnf install glusterfs-server keepalived -y
 sudo systemctl enable glusterd
 sudo systemctl start glusterd
 sudo systemctl enable keepalived

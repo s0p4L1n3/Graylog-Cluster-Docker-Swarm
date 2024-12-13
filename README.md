@@ -55,7 +55,7 @@ Install the necessary tools on each **VM**:
 
 ```bash
 # Update packages
-sudo dnf update && sudo apt upgrade -y
+sudo dnf update && sudo dnf upgrade -y
 
 # Install Docker and Docker Compose
 sudo dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo

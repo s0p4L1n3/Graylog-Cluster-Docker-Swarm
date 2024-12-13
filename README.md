@@ -143,22 +143,34 @@ mkdir /home/admin/mnt-glusterfs
    ```bash
    echo 'gl-swarm-01:/gv0    /home/admin/mnt-glusterfs    glusterfs    defaults,_netdev  0 0' | sudo tee -a /etc/fstab
    sudo systemctl daemon-reload && mount -a
-   { crontab -l; echo "@reboot mount -a"; } | sudo crontab -
+   sudo crontab -e
    ```
-4. Mount the GlusterFS volume on **gl-swarm-02**:
+
+   Add in the crontab: `@reboot mount -a`
+
+   Type Esc and wq keyboard keys
+   
+5. Mount the GlusterFS volume on **gl-swarm-02**:
    ```bash
    echo 'gl-swarm-02:/gv0    /home/admin/mnt-glusterfs    glusterfs    defaults,_netdev  0 0' | sudo tee -a /etc/fstab
    sudo systemctl daemon-reload && mount -a
-   { crontab -l; echo "@reboot mount -a"; } | sudo crontab -
+   sudo crontab -e
    ```
-5. Mount the GlusterFS volume on **gl-swarm-03**:
+
+   Add in the crontab: `@reboot mount -a`
+   Type Esc and wq keyboard keys
+   
+6. Mount the GlusterFS volume on **gl-swarm-03**:
    ```bash
    echo 'gl-swarm-03:/gv0    /home/admin/mnt-glusterfs    glusterfs    defaults,_netdev  0 0' | sudo tee -a /etc/fstab
    sudo systemctl daemon-reload && mount -a
-   { crontab -l; echo "@reboot mount -a"; } | sudo crontab -
+   sudo crontab -e
    ```
 
- 6.  Change the permissions according to your user, (mine is admin):
+   Add in the crontab: `@reboot mount -a`
+   Type Esc and wq keyboard keys
+   
+ 8.  Change the permissions according to your user, (mine is admin):
  ```
  sudo chown -R admin:admin /home/admin/mnt-glusterfs/
  ```

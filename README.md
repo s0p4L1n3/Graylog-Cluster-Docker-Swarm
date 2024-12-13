@@ -223,7 +223,7 @@ sudo systemctl start keepalived
 sudo systemctl restart keepalived
 ```
 
-For **gl-swarm-01**:
+For **gl-swarm-03**:
 ```bash
 sudo bash -c 'cat <<EOF > /etc/keepalived/keepalived.conf
 vrrp_instance VI_1 {

@@ -69,7 +69,7 @@ sudo usermod -aG docker $USER
 - **Keepalived**: For managing the **Virtual IP (VIP)**.
 ```
 # Install GlusterFS and Keepalived
-sudo dnf install epel-release centos-release-gluster10
+sudo dnf install epel-release centos-release-gluster10 -y
 sudo dnf install glusterfs-server keepalived -y
 sudo systemctl enable glusterd
 sudo systemctl start glusterd

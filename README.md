@@ -253,6 +253,8 @@ sudo systemctl restart keepalived
 
 ### 5.1 Prepare network
 
+On one of the nodes:
+
 Create an overlay network: `docker network create -d overlay --attachable gl-swarm-net`, it will be used in the docker compose files as an external network. 
 This network will allow to all containers across the nodes to communicate between them.
 

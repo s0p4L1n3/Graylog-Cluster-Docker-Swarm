@@ -24,6 +24,14 @@ You need to pay attention to all the steps to take before running the docker sta
 
 If not, you will have a message error for MongoDB: `WARNING: MongoDB 5.0+ requires a CPU with AVX support, and your current system does not appear to have that!`
 
+3. Set VM MAX COUNT on the 3 VMs
+
+To avoid errors on opensearch, set the max virtual memory areas to 262144
+```
+echo 'vm.max_map_count = 262144' | sudo tee -a /etc/sysctl.conf
+
+```
+
 ### Software
 - **OS**: Alma Linux 9.5
 - **Docker**: Version 27.3.1

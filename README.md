@@ -74,8 +74,9 @@ sudo dnf install glusterfs-server keepalived -y
 sudo systemctl enable glusterd
 sudo systemctl start glusterd
 sudo systemctl enable keepalived
-sudo systemctl start keepalived
 ```
+
+Do not start now the Keepalive service.
 
 ### 2.3 Set firewalld on all VMs
 
@@ -187,8 +188,9 @@ vrrp_instance VI_1 {
 EOF
 ```
 
-Restart Keepalived:
+Start/Restart Keepalived:
 ```bash
+sudo systemctl start keepalived
 sudo systemctl restart keepalived
 ```
 
@@ -214,6 +216,7 @@ EOF
 
 Restart Keepalived:
 ```bash
+sudo systemctl start keepalived
 sudo systemctl restart keepalived
 ```
 
@@ -239,6 +242,7 @@ EOF
 
 Restart Keepalived:
 ```bash
+sudo systemctl start keepalived
 sudo systemctl restart keepalived
 ```
 

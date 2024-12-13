@@ -302,7 +302,7 @@ wget -O /home/admin/mnt-glusterfs/traefik/certs/graylog.sopaline.lan.key https:/
 
 - Docker stack compose file
 ```
-wget /home/admin/docker-stack.yml -O https://raw.githubusercontent.com/s0p4L1n3/Graylog-Cluster-Docker-Swarm/refs/heads/main/docker-stack-with-Traefik.yml
+wget -O /home/admin/docker-stack.yml -O https://raw.githubusercontent.com/s0p4L1n3/Graylog-Cluster-Docker-Swarm/refs/heads/main/docker-stack-with-Traefik.yml
 ```
 
 BE CAREFUL HERE ! Before running the stack read this below:

@@ -142,7 +142,7 @@ mkdir /home/admin/mnt-glusterfs
 3. Mount the GlusterFS volume on **gl-swarm-01**:
    ```bash
    echo 'gl-swarm-01:/gv0    /home/admin/mnt-glusterfs    glusterfs    defaults,_netdev  0 0' | sudo tee -a /etc/fstab
-   sudo systemctl daemon-reload && mount -a
+   sudo systemctl daemon-reload && sudo mount -a
    { crontab -l; echo "@reboot mount -a"; } | sudo crontab -
    ```
 
@@ -150,14 +150,14 @@ mkdir /home/admin/mnt-glusterfs
 5. Mount the GlusterFS volume on **gl-swarm-02**:
    ```bash
    echo 'gl-swarm-02:/gv0    /home/admin/mnt-glusterfs    glusterfs    defaults,_netdev  0 0' | sudo tee -a /etc/fstab
-   sudo systemctl daemon-reload && mount -a
+   sudo systemctl daemon-reload && sudo mount -a
    { crontab -l; echo "@reboot mount -a"; } | sudo crontab -
    ```
    
 6. Mount the GlusterFS volume on **gl-swarm-03**:
    ```bash
    echo 'gl-swarm-03:/gv0    /home/admin/mnt-glusterfs    glusterfs    defaults,_netdev  0 0' | sudo tee -a /etc/fstab
-   sudo systemctl daemon-reload && mount -a
+   sudo systemctl daemon-reload && sudo mount -a
    { crontab -l; echo "@reboot mount -a"; } | sudo crontab -
    ```
 

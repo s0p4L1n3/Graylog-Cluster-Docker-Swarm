@@ -173,7 +173,7 @@ Check your active network card before pasting the cat EOF command: `ip a`
 
 For **gl-swarm-01**:
 ```bash
-cat <<EOF > /etc/keepalived/keepalived.conf
+sudo bash -c 'cat <<EOF > /etc/keepalived/keepalived.conf
 vrrp_instance VI_1 {
     state MASTER
     interface ens18  
@@ -188,7 +188,7 @@ vrrp_instance VI_1 {
         192.168.30.100/24  # VIP
     }
 }
-EOF
+EOF'
 ```
 
 Start/Restart Keepalived:
@@ -199,7 +199,7 @@ sudo systemctl restart keepalived
 
 For **gl-swarm-02**:
 ```bash
-cat <<EOF > /etc/keepalived/keepalived.conf
+sudo bash -c 'cat <<EOF > /etc/keepalived/keepalived.conf
 vrrp_instance VI_1 {
     state BACKUP
     interface ens18   # Network card (vérifiez with "ip a")
@@ -214,7 +214,7 @@ vrrp_instance VI_1 {
         192.168.30.100/24  # VIP
     }
 }
-EOF
+EOF'
 ```
 
 Restart Keepalived:
@@ -225,7 +225,7 @@ sudo systemctl restart keepalived
 
 For **gl-swarm-01**:
 ```bash
-cat <<EOF > /etc/keepalived/keepalived.conf
+sudo bash -c 'cat <<EOF > /etc/keepalived/keepalived.conf
 vrrp_instance VI_1 {
     state BACKUP
     interface ens18   # Network card (vérifiez with "ip a")
@@ -240,7 +240,7 @@ vrrp_instance VI_1 {
         192.168.30.100/24  # VIP
     }
 }
-EOF
+EOF'
 ```
 
 Restart Keepalived:

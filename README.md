@@ -300,7 +300,11 @@ The folder tree will look like this
 ```
 wget -O /home/admin/mnt-glusterfs/mongodb/init-replset.js https://raw.githubusercontent.com/s0p4L1n3/Graylog-Cluster-Docker-Swarm/main/mnt-glusterfs/mongodb/init-replset.js
 wget -O /home/admin/mnt-glusterfs/mongodb/initdb.d/init-replset.sh https://raw.githubusercontent.com/s0p4L1n3/Graylog-Cluster-Docker-Swarm/main/mnt-glusterfs/mongodb/initdb.d/init-replset.sh
+sudo chown -R 999:999 /home/admin/mnt-glusterfs/mongodb/init-replset.js
+sudo chown -R 999:999 cd /home/admin/mnt-glusterfs/mongodb/initdb.d/
 ```
+
+Chown 999 is to set the ownership ID similar to inside the container, otherwise the replicaset initialization will not work.
 
 - Traefik files and demo cert:
 ```

@@ -70,7 +70,7 @@ services:
     volumes:
       - mongo01-data:/data/db
       - /home/admin/mnt-glusterfs/mongodb/initdb.d:/docker-entrypoint-initdb.d
-      - /home/admin/mnt-glusterfs/mongodb/init-replset.js:/init-replset.js
+      - /home/admin/mnt-glusterfs/mongodb/init-replset.js:/docker-entrypoint-initdb.d/init-replset.js
     ports:
       - target: 27017
         published: 27017
@@ -94,6 +94,7 @@ services:
     hostname: mongodb02
     volumes:
       - mongo02-data:/data/db
+      - /home/admin/mnt-glusterfs/mongodb/initdb.d:/docker-entrypoint-initdb.d
     ports:
       - target: 27017
         published: 27018
@@ -117,6 +118,7 @@ services:
     hostname: mongodb03
     volumes:
       - mongo03-data:/data/db
+      - /home/admin/mnt-glusterfs/mongodb/initdb.d:/docker-entrypoint-initdb.d
     ports:
       - target: 27017
         published: 27019
